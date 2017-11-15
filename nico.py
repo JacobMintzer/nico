@@ -28,16 +28,18 @@ def on_ready():
 	#play(voice,shuff())
 
 @bot.command()
-async def playing():
+@asyncio.coroutine
+def playing():
 	global current
-	await bot.say(current)
+	yield from bot.say(current)
 
 @bot.command()
-async def restart():
+@asyncio.coroutine
+def restart():
 	global voice
-	await voice.disconnect()
+	yield from voice.disconnect()
 	ch=bot.get_channel('254596398853521409')
-	voice2 = await bot.join_voice_channel(ch)
+	voice2 = yield from bot.join_voice_channel(ch)
 	voice=voice2
 	play (voice2,shuff())
 
@@ -58,10 +60,11 @@ def shuff():
 	return songList
 
 @bot.command(pass_context=True)
-async def start(self):
+@asyncio.coroutine
+def start(self):
 	global voice
 	ch=bot.get_channel('254596398853521409')
-	voice = await bot.join_voice_channel(ch)
+	voice = yield from bot.join_voice_channel(ch)
         #current=random.choice(os.listdir("./music/"))
         #player = voice.create_ffmpeg_player("./music/"+current)
         #bot.change_presence(game=discord.Game(type=0,name=current))
