@@ -7,7 +7,7 @@ import os
 import time
 from random import shuffle
 #from mutagen.mp3 import MP3
-bot = commands.Bot(command_prefix=['µsic ','music '], description='Nico Nico Nii~')
+bot = commands.Bot(command_prefix=['µsic ','music ','Music '], description='Nico Nico Nii~')
 if not discord.opus.is_loaded():
 	# the 'opus' library here is opus.dll on windows
 	# or libopus.so on linux in the current directory
