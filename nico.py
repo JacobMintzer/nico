@@ -35,22 +35,63 @@ def playing():
 
 @bot.command()
 @asyncio.coroutine
-def restart():
+def sleep(*,sleepytime):
 	global voice
-	yield from voice.disconnect()
-	ch=bot.get_channel('254596398853521409')
-	voice2 = yield from bot.join_voice_channel(ch)
-	voice=voice2
-	play (voice2,shuff())
+	global sleep
+	sleep=int(sleepytime)
+	yield from bot.say("Nico is going to take a quick nap, the #1 Idol in the Universe will be back in {} seconds!".format(sleep))
+	#time.sleep(30)
+	#play()
+	
+	#ch=bot.get_channel('254596398853521409')
+	#voice2 = yield from bot.join_voice_channel(ch)
+	#voice=voice2
+	#play (voice2,shuff())
 
-def play(voice,songs):
-	global current
-	if len(songs)<1:
-		songs=shuff()
-	current= songs.pop(0)
-	bot.change_presence(game=discord.Game(type=0,name=current))
-	player = voice.create_ffmpeg_player("./music/"+current,after=lambda:play(voice,songs))
+# @bot.command()
+# @asyncio.coroutine
+# def wake():
+	# yield from bot.say("Why did you wake Nico up from her nap? Nico still loves you!")
+	# global sleep
+	# sleep=0
+@asyncio.coroutine
+def play():
+	yield from bot.wait_until_ready()
+	global voice
+	global sleep
+	sleep = 0
+	ch=bot.get_channel('254596398853521409')
+	voice = yield from bot.join_voice_channel(ch)
+	songs=shuff()
+	current=songs.pop(0)
+	player=voice.create_ffmpeg_player("./music/"+current,options="-q:a 9")
+	yield from bot.change_presence(game=discord.Game(type=2,name=current))
 	player.start()
+	while True:
+		
+		if sleep!=0:
+			print ("about to sleep\n")
+			player.stop()
+			yield from voice.disconnect()
+			yield from asyncio.sleep (sleep)
+			sleep = 0
+			voice=yield from bot.join_voice_channel(ch)
+			if len(songs)<1:
+				songs=shuff()
+			current=songs.pop(0)
+			yield from bot.change_presence(game=discord.Game(type=2,name=current))
+			player=voice.create_ffmpeg_player("./music/"+current,options="-q:a 9")
+			player.start()
+		elif player.is_playing():
+			yield from asyncio.sleep(5)
+		else:
+			if len(songs)<1:
+				songs=shuff()
+			current=songs.pop(0)
+			yield from bot.change_presence(game=discord.Game(type=2,name=current))
+			player=voice.create_ffmpeg_player("./music/"+current,options="-q:a 9")
+			player.start()
+		
 	
 
 
@@ -58,11 +99,16 @@ def shuff():
 	songList=os.listdir("./music")
 	shuffle(songList)
 	return songList
+	
+	
+	
+
 
 @bot.command(pass_context=True)
 @asyncio.coroutine
 def start(self):
 	global voice
+	
 	ch=bot.get_channel('254596398853521409')
 	voice = yield from bot.join_voice_channel(ch)
         #current=random.choice(os.listdir("./music/"))
@@ -74,7 +120,25 @@ def start(self):
         #while True:
                 #current= random.choice(os.listdir("./music"))
                 #audio=MP3('./music/'+current)
-	play(voice,shuff())
+				
+	
+	#play(voice,shuff())
+	songs=shuff()
+	current=songs.pop(0)
+	player=voice.create_ffmpeg_player("./music/"+current,options="-q:a 9")
+	yield from bot.change_presence(game=discord.Game(type=0,name=current))
+	player.start()
+	while True:
+		
+		if player.is_playing():
+			time.sleep(5)
+		else:
+			if len(songs)<1:
+				songs=shuff()
+			current=songs.pop(0)
+			yield from bot.change_presence(game=discord.Game(type=0,name=current))
+			player=voice.create_ffmpeg_player("./music/"+current,options="-q:a 8")
+			player.start()
                 #print (audio.info.length)
                 #time.sleep(audio.info.length)	ch=bot.get_channel('254596398853521409')
 	#current=random.choice(os.listdir("./music/"))
@@ -91,5 +155,5 @@ def start(self):
 		#time.sleep(audio.info.length)
 		
 		
-
+bot.loop.create_task(play())
 bot.run('Mzc2OTI4ODU5NDYwODYxOTUy.DOFh5g.3-2968B9V5LATvzRwn7W8tE-mBc')
