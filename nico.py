@@ -6,6 +6,7 @@ import random
 import os
 import time
 from random import shuffle
+import sys
 #from mutagen.mp3 import MP3
 bot = commands.Bot(command_prefix=['µsic ','music ','Music '], description='Nico Nico Nii~')
 if not discord.opus.is_loaded():
@@ -26,6 +27,11 @@ def on_ready():
 	#ch=bot.get_channel('254596398853521409')
 	#voice = bot.join_voice_channel(ch)
 	#play(voice,shuff())
+
+@bot.command()
+@asyncio.coroutine
+def restart():
+	sys.exit(0)
 
 @bot.command()
 @asyncio.coroutine
@@ -59,6 +65,7 @@ def play():
 	yield from bot.wait_until_ready()
 	global voice
 	global sleep
+	global current
 	sleep = 0
 	ch=bot.get_channel('254596398853521409')
 	voice = yield from bot.join_voice_channel(ch)
@@ -72,14 +79,15 @@ def play():
 		if sleep!=0:
 			print ("about to sleep\n")
 			player.stop()
+			yield from bot.change_presence(game=discord.Game(type=2,name="quick {} second nap!".format(sleep)))
 			yield from voice.disconnect()
 			yield from asyncio.sleep (sleep)
+			sys.exit()
 			sleep = 0
 			voice=yield from bot.join_voice_channel(ch)
 			if len(songs)<1:
 				songs=shuff()
 			current=songs.pop(0)
-			yield from bot.change_presence(game=discord.Game(type=2,name=current))
 			player=voice.create_ffmpeg_player("./music/"+current,options="-q:a 9")
 			player.start()
 		elif player.is_playing():
