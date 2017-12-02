@@ -164,4 +164,4 @@ def start(self):
 		
 		
 bot.loop.create_task(play())
-bot.run('Mzc2OTI4ODU5NDYwODYxOTUy.DOFh5g.3-2968B9V5LATvzRwn7W8tE-mBc')
+bot.run('token')
